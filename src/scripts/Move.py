@@ -1,5 +1,7 @@
 import copy
 
+from Piece import Piece
+
 def check_turn(board, old_x, old_y):
     return True if board.board[old_y][old_x].color == board.turn else False
 
@@ -137,11 +139,15 @@ def check_pawn(board, old_x, old_y, new_x, new_y):
         if not board.board[new_y][new_x]:
             if color == 'w':
                 if new_y - old_y == -1:
+                    if new_y == 0:
+                        return [True, True]
                     return True
                 if new_y - old_y == -2 and old_y == 6:
                     return True
             if color == 'b':
                 if new_y - old_y == 1:
+                    if new_y == 7:
+                        return [True, True]
                     return True
                 if new_y - old_y == 2 and old_y == 1:
                     return True
@@ -150,10 +156,14 @@ def check_pawn(board, old_x, old_y, new_x, new_y):
         if color == 'w':
             if new_y - old_y == -1:
                 if board.board[new_y][new_x]:
+                    if new_y == 0:
+                        return [True, True]
                     return True
         if color == 'b':
             if new_y - old_y == 1:
                 if board.board[new_y][new_x]:
+                    if new_y == 7:
+                        return [True, True]
                     return True
     
     return False
@@ -182,7 +192,10 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
     if piece == 'n':
         if not check_knight(old_x, old_y, new_x, new_y): return False
     
+    promote = False
     if piece == 'p':
+        if isinstance(check_pawn(board, old_x, old_y, new_x, new_y), list):
+            promote = True
         if not check_pawn(board, old_x, old_y, new_x, new_y):
             return False
     
@@ -195,13 +208,24 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
     if not check and not check_check(board, old_x, old_y, new_x, new_y):
         return False
     
+    if promote:
+        return [True, True]
+    
     return True
 
 def move(board, old_x, old_y, new_x, new_y):
 
-    if is_legal(board, old_x, old_y, new_x, new_y):
+    legal = is_legal(board, old_x, old_y, new_x, new_y)
 
-        board.board[new_y][new_x] = board.board[old_y][old_x]
+    if legal:
+            
+        if isinstance(legal, list):
+            color = board.turn
+            board.board[new_y][new_x] = Piece(color, 'q')
+
+        else:
+            board.board[new_y][new_x] = board.board[old_y][old_x]
+
         board.board[old_y][old_x] = None
 
         board.change_turn()
