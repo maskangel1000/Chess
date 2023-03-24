@@ -20,13 +20,18 @@ def draw_squares(screen, board):
             is_white = not is_white
         is_white = not is_white
 
-def draw_pieces(screen, board):
+def draw_pieces(screen, board, dragging, selected_piece):
     for row in range(0, len(board.board)):
         for col in range(0, len(board.board[row])):
             if board.board[row][col]:
                 piece_name = board.board[row][col].color + board.board[row][col].type
                 piece_image = pygame.image.load(f"../assets/{piece_name}.png")
-                screen.blit(piece_image, (col*64 + 3, row*64 + 3))
+                if dragging and selected_piece[1] == col and selected_piece[2] == row:
+                    mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
+                    mouse_x, mouse_y = mouse_pos
+                    screen.blit(piece_image, (mouse_x - 58/2, mouse_y - 58/2))
+                else:
+                    screen.blit(piece_image, (col*64 + 3, row*64 + 3))
     
 def get_mouse_square(board):
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
@@ -41,12 +46,12 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
     if dragging and selected_piece[0]:
         rect = (x * 64, y * 64, 64, 64)
         if Move.is_legal(board, selected_piece[1], selected_piece[2], x, y):
-            pygame.draw.rect(screen, (0, 255, 0, 50), rect, 2)
+            pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
         else:
-            pygame.draw.rect(screen, (255, 0, 0, 50), rect, 2)
+            pygame.draw.rect(screen, (255, 0, 0, 50), rect, 3)
     elif piece:
         rect = (x * 64, y * 64, 64, 64)
-        pygame.draw.rect(screen, (0, 255, 0, 50), rect, 2)
+        pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
 
 def main(board):
 
@@ -105,8 +110,8 @@ def main(board):
         piece, x, y = get_mouse_square(board)
 
         draw_squares(screen, board)
-        draw_pieces(screen, board)
         draw_selector(board, screen, piece, x, y, dragging, selected_piece)
+        draw_pieces(screen, board, dragging, selected_piece)
 
         # Clock
 
