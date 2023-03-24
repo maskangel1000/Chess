@@ -37,10 +37,16 @@ def get_mouse_square(board):
     except IndexError:
         return None, None, None
     
-def draw_selector(screen, piece, x, y):
-    if piece:
+def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
+    if dragging and selected_piece[0]:
         rect = (x * 64, y * 64, 64, 64)
-        pygame.draw.rect(screen, (255, 0, 0, 50), rect, 2)
+        if Move.is_legal(board, selected_piece[1], selected_piece[2], x, y):
+            pygame.draw.rect(screen, (0, 255, 0, 50), rect, 2)
+        else:
+            pygame.draw.rect(screen, (255, 0, 0, 50), rect, 2)
+    elif piece:
+        rect = (x * 64, y * 64, 64, 64)
+        pygame.draw.rect(screen, (0, 255, 0, 50), rect, 2)
 
 def main(board):
 
@@ -100,7 +106,7 @@ def main(board):
 
         draw_squares(screen, board)
         draw_pieces(screen, board)
-        draw_selector(screen, piece, x, y)
+        draw_selector(board, screen, piece, x, y, dragging, selected_piece)
 
         # Clock
 
