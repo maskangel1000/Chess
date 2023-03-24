@@ -27,7 +27,7 @@ def draw_pieces(screen, board, dragging, selected_piece):
             if board.board[row][col]:
                 piece_name = board.board[row][col].color + board.board[row][col].type
                 piece_image = pygame.image.load(f"../assets/{piece_name}.png")
-                if dragging and selected_piece[1] == col and selected_piece[2] == row:
+                if dragging and selected_piece and selected_piece[1] == col and selected_piece[2] == row:
                     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
                     mouse_x, mouse_y = mouse_pos
                     drag_queue = piece_image
@@ -46,7 +46,7 @@ def get_mouse_square(board):
         return None, None, None
     
 def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
-    if dragging and selected_piece[0]:
+    if dragging and selected_piece and selected_piece[0]:
         rect = (x * 64, y * 64, 64, 64)
         if Move.is_legal(board, selected_piece[1], selected_piece[2], x, y):
             pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
