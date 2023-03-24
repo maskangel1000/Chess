@@ -216,6 +216,9 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
 def move(board, old_x, old_y, new_x, new_y):
 
     legal = is_legal(board, old_x, old_y, new_x, new_y)
+        
+    piece = board.board[old_y][old_x].type
+    color = board.board[old_y][old_x].color
 
     if legal:
             
@@ -225,6 +228,11 @@ def move(board, old_x, old_y, new_x, new_y):
 
         else:
             board.board[new_y][new_x] = board.board[old_y][old_x]
+
+        if piece == 'k' and board.turn == 'w':
+            board.castle_wk, board.castle_wq = False, False
+        elif piece == 'k' and board.turn == 'q':
+            board.castle_bk, board.castle_bq = False, False
 
         board.board[old_y][old_x] = None
 
