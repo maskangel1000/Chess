@@ -21,6 +21,7 @@ def draw_squares(screen, board):
         is_white = not is_white
 
 def draw_pieces(screen, board, dragging, selected_piece):
+    drag_queue = None
     for row in range(0, len(board.board)):
         for col in range(0, len(board.board[row])):
             if board.board[row][col]:
@@ -29,9 +30,11 @@ def draw_pieces(screen, board, dragging, selected_piece):
                 if dragging and selected_piece[1] == col and selected_piece[2] == row:
                     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
                     mouse_x, mouse_y = mouse_pos
-                    screen.blit(piece_image, (mouse_x - 58/2, mouse_y - 58/2))
+                    drag_queue = piece_image
                 else:
                     screen.blit(piece_image, (col*64 + 3, row*64 + 3))
+    if drag_queue:
+        screen.blit(drag_queue, (mouse_x - 58/2, mouse_y - 58/2))
     
 def get_mouse_square(board):
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
