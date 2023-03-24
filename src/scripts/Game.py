@@ -52,7 +52,7 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
             pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
         else:
             pygame.draw.rect(screen, (255, 0, 0, 50), rect, 3)
-    elif piece:
+    elif piece and piece.color == board.turn:
         rect = (x * 64, y * 64, 64, 64)
         pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
 
