@@ -10,6 +10,7 @@ Chess made in Python using pygame.
 ## TODO
 - Add castling
 - Add en passant
+- Add pawn promotions
 - Move piece with mouse while dragging
 - Add click to move
 - Add sounds
