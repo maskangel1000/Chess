@@ -11,3 +11,4 @@ Chess made in Python using pygame.
 - Add en passant
 - Add click to move
 - Add sounds
+- Make website to play
