@@ -10,3 +10,4 @@ Chess made in Python using pygame.
 ## TODO
 - Add en passant
 - Add click to move
+- Make website to play
