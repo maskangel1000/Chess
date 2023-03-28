@@ -56,12 +56,39 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
         rect = (x * 64, y * 64, 64, 64)
         pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
 
+def end_game(screen, loser, board):
+    draw_squares(screen, board)
+    draw_pieces(screen, board, None, None)
+
+    winner = "White" if loser == 'b' else "Black"
+    same_color = (195, 195, 195) if winner == "White" else (60, 60, 60)
+    opposite_color = (60, 60, 60) if winner == "White" else (195, 195, 195)
+
+    background = pygame.Surface((WIDTH, HEIGHT))
+    background.set_alpha(200)
+    background.fill(same_color)
+    screen.blit(background, (0, 0))
+
+    button = pygame.Surface((200, 50))
+    button.set_alpha(150)
+    button.fill(opposite_color)
+    screen.blit(button, (WIDTH/2-100, HEIGHT/2))
+
+    font = pygame.font.SysFont("Arial", 30)
+
+    win_text = font.render(f"{winner} wins!", True, opposite_color)
+    screen.blit(win_text, (WIDTH/2-75, HEIGHT/2-50))
+
+    play_text = font.render("PLAY AGAIN", True, same_color)
+    screen.blit(play_text, (WIDTH/2-85, HEIGHT/2+10))
+
 def main(board):
 
     # Init
 
     pygame.init()
     pygame.mixer.init()
+    pygame.font.init()
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -81,6 +108,8 @@ def main(board):
     clock = pygame.time.Clock()
 
     running = True
+    checkmate = False
+    checkmate_button = False
 
     while running:
 
@@ -93,11 +122,23 @@ def main(board):
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 dragging = True
-                if piece:
+                if checkmate:
+                    mouse = pygame.mouse.get_pos()
+                    if WIDTH/2-100 <= mouse[0] <= WIDTH/2+100 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+50:
+                        checkmate_button = True
+                elif piece:
                     selected_piece = piece, x, y
             
             if event.type == pygame.MOUSEBUTTONUP:
-                if selected_piece:
+                if checkmate_button:
+                    mouse = pygame.mouse.get_pos()
+                    if WIDTH/2-100 <= mouse[0] <= WIDTH/2+100 and HEIGHT/2 <= mouse[1] <= HEIGHT/2+50:
+                        board.reset_board()
+                        checkmate = False
+                        checkmate_button = False
+                        selected_piece = None
+
+                elif selected_piece and not checkmate:
                     piece, old_x, old_y = selected_piece
                     capture, castle, check = False, False, False
 
@@ -110,6 +151,9 @@ def main(board):
 
                         if not Move.check_check(board, 0, 0, 0, 0):
                             check = True
+                            if Move.is_checkmate(board):
+                                checkmate = True
+                                end_game(screen, board.turn, board)
 
                         if check:
                             sound = pygame.mixer.Sound("../assets/check.mp3")
@@ -123,8 +167,8 @@ def main(board):
                         else:
                             sound = pygame.mixer.Sound("../assets/move.mp3")
                             pygame.mixer.Sound.play(sound)
-                            
-                dragging = False
+
+                    dragging = False
 
         # Draws
 
@@ -132,14 +176,17 @@ def main(board):
         pygame.display.set_icon(icon)
 
         # Updates
+        
 
-        if not dragging: selected_piece = None
+        if not checkmate:
 
-        piece, x, y = get_mouse_square(board)
+            if not dragging: selected_piece = None
 
-        draw_squares(screen, board)
-        draw_selector(board, screen, piece, x, y, dragging, selected_piece)
-        draw_pieces(screen, board, dragging, selected_piece)
+            piece, x, y = get_mouse_square(board)
+
+            draw_squares(screen, board)
+            draw_selector(board, screen, piece, x, y, dragging, selected_piece)
+            draw_pieces(screen, board, dragging, selected_piece)
 
         # Clock
 

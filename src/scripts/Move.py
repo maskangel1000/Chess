@@ -46,6 +46,17 @@ def check_check(board, old_x, old_y, new_x, new_y):
     
     return True
 
+def is_checkmate(board):
+    for row in range(0, len(board.board)):
+        for col in range(0, len(board.board[row])):
+            piece = board.board[row][col]
+            if piece and piece.color == board.turn:
+                for row2 in range(0, len(board.board)):
+                    for col2 in range(0, len(board.board)):
+                        if is_legal(board, col, row, col2, row2):
+                            return False
+    return True
+
 def check_bishop(board, old_x, old_y, new_x, new_y):
 
     offset_x = abs(new_x - old_x)

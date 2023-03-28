@@ -3,9 +3,10 @@ from Piece import Piece
 class Board():
 
     def __init__(self):
+        self.reset_board()
 
+    def reset_board(self):
         self.board = [[None for col in range(0, 8)] for row in range(0, 8)]
-
         start_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         self.load_fen(start_fen)
     
