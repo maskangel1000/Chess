@@ -162,14 +162,16 @@ def check_pawn(board, old_x, old_y, new_x, new_y):
                         return [True, True]
                     return True
                 if new_y - old_y == -2 and old_y == 6:
-                    return True
+                    if not board.board[old_y-1][old_x]:
+                        return True
             if color == 'b':
                 if new_y - old_y == 1:
                     if new_y == 7:
                         return [True, True]
                     return True
                 if new_y - old_y == 2 and old_y == 1:
-                    return True
+                    if not board.board[old_y+1][old_x]:
+                        return True
 
     if abs(new_x - old_x) == 1:
         if color == 'w':
