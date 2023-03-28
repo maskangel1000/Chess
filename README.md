@@ -1,5 +1,6 @@
 # Chess
 Chess made in Python using pygame.
+Quite unoptimized, if I were to make it again I would instead generate and save all legal moves
 
 ## Steps to play
 1. Download Python and install pygame
