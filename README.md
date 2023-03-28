@@ -8,6 +8,7 @@ Chess made in Python using pygame.
 4. Drag and click pieces to move them
 
 ## TODO
-- Add en passant
-- Add click to move
 - Make website to play
+- Add en passant
+- Add tests
+- Add click to move
