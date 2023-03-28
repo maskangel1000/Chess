@@ -9,7 +9,5 @@ Chess made in Python using pygame.
 
 ## TODO
 - Add en passant
-- Add pawn promotions
 - Add click to move
 - Add sounds
-- Load position from FEN string
