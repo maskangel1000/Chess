@@ -61,6 +61,7 @@ def main(board):
     # Init
 
     pygame.init()
+    pygame.mixer.init()
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -98,7 +99,31 @@ def main(board):
             if event.type == pygame.MOUSEBUTTONUP:
                 if selected_piece:
                     piece, old_x, old_y = selected_piece
-                    Move.move(board, old_x, old_y, x, y)
+                    capture, castle, check = False, False, False
+
+                    if board.board[y][x]:
+                        capture = True
+                    if board.board[old_y][old_x].type == 'k' and abs(x-old_x) > 1:
+                        castle = True
+
+                    if Move.move(board, old_x, old_y, x, y):
+
+                        if not Move.check_check(board, 0, 0, 0, 0):
+                            check = True
+
+                        if check:
+                            sound = pygame.mixer.Sound("../assets/check.mp3")
+                            pygame.mixer.Sound.play(sound)
+                        elif capture:
+                            sound = pygame.mixer.Sound("../assets/capture.mp3")
+                            pygame.mixer.Sound.play(sound)
+                        elif castle:
+                            sound = pygame.mixer.Sound("../assets/castle.mp3")
+                            pygame.mixer.Sound.play(sound)
+                        else:
+                            sound = pygame.mixer.Sound("../assets/move.mp3")
+                            pygame.mixer.Sound.play(sound)
+                            
                 dragging = False
 
         # Draws

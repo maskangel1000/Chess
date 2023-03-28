@@ -274,6 +274,9 @@ def move(board, old_x, old_y, new_x, new_y):
         else:
             board.board[new_y][new_x] = board.board[old_y][old_x]
 
+        # Castling
+        # TODO: If rook is taken before moving, then other rook is placed in its spot, player can still castle
+
         if piece == 'k' and board.turn == 'w':
             board.castle_wk, board.castle_wq = False, False
         elif piece == 'k' and board.turn == 'q':
@@ -293,3 +296,7 @@ def move(board, old_x, old_y, new_x, new_y):
         board.board[old_y][old_x] = None
 
         board.change_turn()
+
+        return True
+    
+    return False
