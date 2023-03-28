@@ -116,6 +116,25 @@ def check_king(board, old_x, old_y, new_x, new_y):
     if offset_x <= 1 and offset_y <= 1:
         return True
     
+    if board.turn == 'w':
+        if board.castle_wk and new_x == 6 and new_y == 7:
+            if not board.board[7][5] and not board.board[7][6]:
+                if board.board[7][7] and board.board[7][7].color == 'w' and board.board[7][7].type == 'r':
+                    return [True, "wk"]
+        if board.castle_wq and new_x == 2 and new_y == 7:
+            if not board.board[7][1] and not board.board[7][2] and not board.board[7][3]:
+                if board.board[7][0] and board.board[7][0].color == 'w' and board.board[7][0].type == 'r':
+                    return [True, "wq"]
+    if board.turn == 'b':
+        if board.castle_bk and new_x == 6 and new_y == 0:
+            if not board.board[0][5] and not board.board[0][6]:
+                if board.board[0][7] and board.board[0][7].color == 'b' and board.board[0][7].type == 'r':
+                    return [True, "bk"]
+        if board.castle_bq and new_x == 2 and new_y == 0:
+            if not board.board[0][1] and not board.board[0][2] and not board.board[0][3]:
+                if board.board[0][0] and board.board[0][0].color == 'b' and board.board[0][0].type == 'r':
+                    return [True, "bq"]
+    
     return False
 
 def check_knight(old_x, old_y, new_x, new_y):
@@ -172,7 +191,7 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
 
     piece = board.board[old_y][old_x].type
 
-    if not check_same(board, old_x, old_y, new_x, new_y):
+    if not check and not check_same(board, old_x, old_y, new_x, new_y):
         return False
     
     if piece == 'q':
@@ -186,8 +205,12 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
     if piece == 'r':
         if not check_rook(board, old_x, old_y, new_x, new_y): return False
     
+    castle = False
     if piece == 'k':
-        if not check_king(board, old_x, old_y, new_x, new_y): return False
+        if isinstance(check_king(board, old_x, old_y, new_x, new_y), list):
+            castle = True
+        if not check_king(board, old_x, old_y, new_x, new_y):
+            return False
     
     if piece == 'n':
         if not check_knight(old_x, old_y, new_x, new_y): return False
@@ -209,7 +232,10 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
         return False
     
     if promote:
-        return [True, True]
+        return [True, 1]
+    
+    if castle:
+        return [True, 2]
     
     return True
 
@@ -223,8 +249,27 @@ def move(board, old_x, old_y, new_x, new_y):
     if legal:
             
         if isinstance(legal, list):
-            color = board.turn
-            board.board[new_y][new_x] = Piece(color, 'q')
+            if legal[1] == 1: # Promote
+                color = board.turn
+                board.board[new_y][new_x] = Piece(color, 'q')
+            elif legal[1] == 2: # Castle
+                color = board.turn
+                if color == 'w' and new_x == 6:
+                    board.board[new_y][new_x] = Piece(color, 'k')
+                    board.board[new_y][new_x-1] = Piece(color, 'r')
+                    board.board[new_y][7] = None
+                elif color == 'w' and new_x == 2:
+                    board.board[new_y][new_x] = Piece(color, 'k')
+                    board.board[new_y][new_x+1] = Piece(color, 'r')
+                    board.board[new_y][0] = None
+                elif color == 'b' and new_x == 6:
+                    board.board[new_y][new_x] = Piece(color, 'k')
+                    board.board[new_y][new_x-1] = Piece(color, 'r')
+                    board.board[new_y][7] = None
+                elif color == 'b' and new_x == 2:
+                    board.board[new_y][new_x] = Piece(color, 'k')
+                    board.board[new_y][new_x+1] = Piece(color, 'r')
+                    board.board[new_y][0] = None
 
         else:
             board.board[new_y][new_x] = board.board[old_y][old_x]
@@ -233,6 +278,17 @@ def move(board, old_x, old_y, new_x, new_y):
             board.castle_wk, board.castle_wq = False, False
         elif piece == 'k' and board.turn == 'q':
             board.castle_bk, board.castle_bq = False, False
+        
+        elif piece == 'r' and board.turn == 'w':
+            if old_y == 7 and old_x == 7:
+                board.castle_wk = False
+            if old_y == 7 and old_x == 0:
+                board.castle_wq = False
+        elif piece == 'r' and board.turn == 'b':
+            if old_y == 0 and old_x == 7:
+                board.castle_bk = False
+            if old_y == 0 and old_x == 0:
+                board.castle_bq = False
 
         board.board[old_y][old_x] = None
 
