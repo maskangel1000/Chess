@@ -1,6 +1,6 @@
 from Piece import Piece
 
-class Board():
+class Board:
 
     def __init__(self):
         self.reset_board()
