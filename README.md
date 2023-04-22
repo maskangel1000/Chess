@@ -12,6 +12,5 @@ Quite unoptimized, if I were to make it again I would instead generate and save 
 ## TODO
 - Completely rewrite logic of Move.py
 - Make website to play
-- Add en passant
 - Add tests
 - Add click to move
