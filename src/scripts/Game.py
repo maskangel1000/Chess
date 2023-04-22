@@ -142,7 +142,7 @@ def main(board):
                     piece, old_x, old_y = selected_piece
                     capture, castle, check = False, False, False
 
-                    if board.board[y][x]:
+                    if board.board[y][x] or (board.enpassant_x == x and board.enpassant_y == y):
                         capture = True
                     if board.board[old_y][old_x].type == 'k' and abs(x-old_x) > 1:
                         castle = True
