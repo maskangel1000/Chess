@@ -131,20 +131,20 @@ def check_king(board, old_x, old_y, new_x, new_y):
         if board.castle_wk and new_x == 6 and new_y == 7:
             if not board.board[7][5] and not board.board[7][6]:
                 if board.board[7][7] and board.board[7][7].color == 'w' and board.board[7][7].type == 'r':
-                    return [True, "wk"]
+                    return [True, True]
         if board.castle_wq and new_x == 2 and new_y == 7:
             if not board.board[7][1] and not board.board[7][2] and not board.board[7][3]:
                 if board.board[7][0] and board.board[7][0].color == 'w' and board.board[7][0].type == 'r':
-                    return [True, "wq"]
+                    return [True, True]
     if board.turn == 'b':
         if board.castle_bk and new_x == 6 and new_y == 0:
             if not board.board[0][5] and not board.board[0][6]:
                 if board.board[0][7] and board.board[0][7].color == 'b' and board.board[0][7].type == 'r':
-                    return [True, "bk"]
+                    return [True, True]
         if board.castle_bq and new_x == 2 and new_y == 0:
             if not board.board[0][1] and not board.board[0][2] and not board.board[0][3]:
                 if board.board[0][0] and board.board[0][0].color == 'b' and board.board[0][0].type == 'r':
-                    return [True, "bq"]
+                    return [True, True]
     
     return False
 
@@ -164,39 +164,43 @@ def check_knight(old_x, old_y, new_x, new_y):
 def check_pawn(board, old_x, old_y, new_x, new_y):
 
     color = board.board[old_y][old_x].color
-
+    
     if old_x == new_x:
         if not board.board[new_y][new_x]:
             if color == 'w':
                 if new_y - old_y == -1:
                     if new_y == 0:
-                        return [True, True]
+                        return [True, 1]
                     return True
                 if new_y - old_y == -2 and old_y == 6:
                     if not board.board[old_y-1][old_x]:
-                        return True
+                        return [True, 3, new_x, new_y+1]
             if color == 'b':
                 if new_y - old_y == 1:
                     if new_y == 7:
-                        return [True, True]
+                        return [True, 1]
                     return True
                 if new_y - old_y == 2 and old_y == 1:
                     if not board.board[old_y+1][old_x]:
-                        return True
+                        return [True, 3, new_x, new_y-1]
 
     if abs(new_x - old_x) == 1:
         if color == 'w':
             if new_y - old_y == -1:
                 if board.board[new_y][new_x]:
                     if new_y == 0:
-                        return [True, True]
+                        return [True, 1]
                     return True
+                elif board.enpassant_x == new_x and board.enpassant_y == new_y:
+                    return [True, 2]
         if color == 'b':
             if new_y - old_y == 1:
                 if board.board[new_y][new_x]:
                     if new_y == 7:
-                        return [True, True]
+                        return [True, 1]
                     return True
+                elif board.enpassant_x == new_x and board.enpassant_y == new_y:
+                    return [True, 2]
     
     return False
 
@@ -229,9 +233,17 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
         if not check_knight(old_x, old_y, new_x, new_y): return False
     
     promote = False
+    enpassant = False
+    keep_enpassant = False
     if piece == 'p':
-        if isinstance(check_pawn(board, old_x, old_y, new_x, new_y), list):
-            promote = True
+        return_list = check_pawn(board, old_x, old_y, new_x, new_y)
+        if isinstance(return_list, list):
+            if return_list[1] == 1:
+                promote = True
+            elif return_list[1] == 2:
+                enpassant = True
+            elif return_list[1] == 3:
+                keep_enpassant = [True, 4, return_list[2], return_list[3]]
         if not check_pawn(board, old_x, old_y, new_x, new_y):
             return False
     
@@ -250,6 +262,12 @@ def is_legal(board, old_x, old_y, new_x, new_y, check=False):
     if castle:
         return [True, 2]
     
+    if enpassant:
+        return [True, 3]
+    
+    if keep_enpassant:
+        return keep_enpassant
+    
     return True
 
 def move(board, old_x, old_y, new_x, new_y):
@@ -257,16 +275,13 @@ def move(board, old_x, old_y, new_x, new_y):
     legal = is_legal(board, old_x, old_y, new_x, new_y)
         
     piece = board.board[old_y][old_x].type
-    color = board.board[old_y][old_x].color
+    color = board.turn
 
     if legal:
-            
         if isinstance(legal, list):
             if legal[1] == 1: # Promote
-                color = board.turn
                 board.board[new_y][new_x] = Piece(color, 'q')
             elif legal[1] == 2: # Castle
-                color = board.turn
                 if color == 'w' and new_x == 6:
                     board.board[new_y][new_x] = Piece(color, 'k')
                     board.board[new_y][new_x-1] = Piece(color, 'r')
@@ -283,12 +298,25 @@ def move(board, old_x, old_y, new_x, new_y):
                     board.board[new_y][new_x] = Piece(color, 'k')
                     board.board[new_y][new_x+1] = Piece(color, 'r')
                     board.board[new_y][0] = None
-
+            elif legal[1] == 3: # Enpassant
+                board.board[new_y][new_x] = board.board[old_y][old_x]
+                if color == 'w':
+                    board.board[new_y+1][new_x] = None
+                else:
+                    board.board[new_y-1][new_x] = None
+            elif legal[1] == 4: # Keep enpassant
+                board.enpassant_x = legal[2]
+                board.enpassant_y = legal[3]
+                print(legal[2], legal[3])
+                board.board[new_y][new_x] = board.board[old_y][old_x]
         else:
             board.board[new_y][new_x] = board.board[old_y][old_x]
 
         # Castling
         # TODO: If rook is taken before moving, then other rook is placed in its spot, player can still castle
+        
+        if piece != 'p' or not isinstance(legal, list) or (isinstance(legal, list) and legal[1] != 4):
+            board.enpassant_x, board.enpassant_y = None, None
 
         if piece == 'k' and board.turn == 'w':
             board.castle_wk, board.castle_wq = False, False
