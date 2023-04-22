@@ -307,7 +307,6 @@ def move(board, old_x, old_y, new_x, new_y):
             elif legal[1] == 4: # Keep enpassant
                 board.enpassant_x = legal[2]
                 board.enpassant_y = legal[3]
-                print(legal[2], legal[3])
                 board.board[new_y][new_x] = board.board[old_y][old_x]
         else:
             board.board[new_y][new_x] = board.board[old_y][old_x]
