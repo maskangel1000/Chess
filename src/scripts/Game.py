@@ -2,8 +2,8 @@ import pygame
 
 import Move
 
-WIDTH = 512
-HEIGHT = 512
+WIDTH = 500
+HEIGHT = 500
 
 LIGHT = (227, 209, 200)
 DARK = (112, 92, 69)
@@ -12,7 +12,7 @@ def draw_squares(screen, board):
     is_white = True
     for x in range(0, len(board.board)):
         for y in range(0, len(board.board[x])):
-            square = pygame.rect.Rect(x*64, y*64, 64, 64)
+            square = pygame.rect.Rect(x*WIDTH/8, y*HEIGHT/8, WIDTH/8, HEIGHT/8)
             if is_white:
                 pygame.draw.rect(screen, LIGHT, square)
             else:
@@ -27,18 +27,20 @@ def draw_pieces(screen, board, dragging, selected_piece):
             if board.board[row][col]:
                 piece_name = board.board[row][col].color + board.board[row][col].type
                 piece_image = pygame.image.load(f"../assets/{piece_name}.png")
+                piece_image = pygame.transform.scale(piece_image, (WIDTH//8, HEIGHT//8))
                 if dragging and selected_piece and selected_piece[1] == col and selected_piece[2] == row:
                     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
                     mouse_x, mouse_y = mouse_pos
                     drag_queue = piece_image
                 else:
-                    screen.blit(piece_image, (col*64 + 3, row*64 + 3))
+                    screen.blit(piece_image, (col*WIDTH/8, row*HEIGHT/8))
     if drag_queue:
-        screen.blit(drag_queue, (mouse_x - 58/2, mouse_y - 58/2))
+        screen.blit(drag_queue, (mouse_x - (WIDTH//8) / 2, mouse_y - (HEIGHT//8) / 2))
     
 def get_mouse_square(board):
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
-    x, y = [int(v // 64) for v in mouse_pos]
+    x = int(mouse_pos[0] // (WIDTH/8))
+    y = int(mouse_pos[1] // (HEIGHT/8))
     try:
         if x >= 0 and y >= 0:
             return board.board[y][x], x, y
@@ -46,15 +48,18 @@ def get_mouse_square(board):
         return None, None, None
     
 def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
+    if not x or not y:
+        return
+    rect = (x*WIDTH/8, y*HEIGHT/8, WIDTH/8, HEIGHT/8)
     if dragging and selected_piece and selected_piece[0]:
-        rect = (x * 64, y * 64, 64, 64)
         if Move.is_legal(board, selected_piece[1], selected_piece[2], x, y):
-            pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
+            pygame.draw.rect(screen, (0, 255, 0, 50), rect, WIDTH//170)
         else:
-            pygame.draw.rect(screen, (255, 0, 0, 50), rect, 3)
+            pygame.draw.rect(screen, (255, 0, 0, 50), rect, WIDTH//170)
     elif piece and piece.color == board.turn:
-        rect = (x * 64, y * 64, 64, 64)
-        pygame.draw.rect(screen, (0, 255, 0, 50), rect, 3)
+        pygame.draw.rect(screen, (0, 255, 0, 50), rect, WIDTH//170)
+    else:
+        print(1)
 
 def end_game(screen, loser, board):
     draw_squares(screen, board)
@@ -139,6 +144,9 @@ def main(board):
                         selected_piece = None
 
                 elif selected_piece and not checkmate:
+                    if not x or not y:
+                        continue
+                    
                     piece, old_x, old_y = selected_piece
                     capture, castle, check = False, False, False
 
@@ -182,7 +190,10 @@ def main(board):
 
             if not dragging: selected_piece = None
 
-            piece, x, y = get_mouse_square(board)
+            try:
+                piece, x, y = get_mouse_square(board)
+            except TypeError:
+                continue
 
             draw_squares(screen, board)
             draw_selector(board, screen, piece, x, y, dragging, selected_piece)
