@@ -58,8 +58,6 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
             pygame.draw.rect(screen, (255, 0, 0, 50), rect, WIDTH//170)
     elif piece and piece.color == board.turn:
         pygame.draw.rect(screen, (0, 255, 0, 50), rect, WIDTH//170)
-    else:
-        print(1)
 
 def end_game(screen, loser, board):
     draw_squares(screen, board)
