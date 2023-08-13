@@ -10,6 +10,9 @@ Quite unoptimized, if I were to make it again I would instead generate and save 
 4. Drag and click pieces to move them
 
 ## TODO
+- Make start menu
+- Make settings menu
+- Make button library for ease of use
 - Completely rewrite logic of Move.py
 - Improve graphics
 - Make website to play
