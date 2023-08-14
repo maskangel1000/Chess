@@ -57,8 +57,8 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece, width, h
         pygame.draw.rect(screen, (0, 255, 0, 50), rect, width//130)
 
 def end_game(screen, loser, board, width, height):
-    draw_squares(screen, board)
-    draw_pieces(screen, board, None, None)
+    draw_squares(screen, board, width, height)
+    draw_pieces(screen, board, None, None, width, height)
 
     winner = "White" if loser == 'b' else "Black"
     same_color = (195, 195, 195) if winner == "White" else (60, 60, 60)
@@ -74,6 +74,11 @@ def end_game(screen, loser, board, width, height):
     button.fill(opposite_color)
     screen.blit(button, (width/2-100, height/2))
 
+    menu_button = pygame.Surface((200, 50))
+    menu_button.set_alpha(150)
+    menu_button.fill(opposite_color)
+    screen.blit(menu_button, (width/2-100, height/2+height/7))
+
     font = pygame.font.SysFont("Arial", 30)
 
     win_text = font.render(f"{winner} wins!", True, opposite_color)
@@ -81,6 +86,9 @@ def end_game(screen, loser, board, width, height):
 
     play_text = font.render("PLAY AGAIN", True, same_color)
     screen.blit(play_text, (width/2-85, height/2+10))
+
+    menu_text = font.render("MENU", True, same_color)
+    screen.blit(menu_text, (width/2-85, height/2+10+height/7))
     
 def draw_menu(screen, width, height):
     background = pygame.Surface((width, height))
@@ -197,7 +205,14 @@ def main(board, width, height):
                 mouse = pygame.mouse.get_pos()
                 if checkmate:
                     if width/2-100 <= mouse[0] <= width/2+100 and height/2 <= mouse[1] <= height/2+50:
-                        checkmate_button = True
+                        board.reset_board()
+                        checkmate = False
+                        selected_piece = None
+                    if width/2-100 <= mouse[0] <= width/2+100 and height/2+height/7 <= mouse[1] <= height/2+50+height/7:
+                        board.reset_board()
+                        checkmate = False
+                        selected_piece = None
+                        menu = True
                 elif menu:
                     if width/2-100 <= mouse[0] <= width/2+100 and height/2-height/10 <= mouse[1] <= height/2-height/10+50:
                         menu = False
@@ -247,15 +262,7 @@ def main(board, width, height):
                         temp_height += chr(event.key)
             
             if event.type == pygame.MOUSEBUTTONUP:
-                if checkmate_button:
-                    mouse = pygame.mouse.get_pos()
-                    if width/2-100 <= mouse[0] <= width/2+100 and height/2 <= mouse[1] <= height/2+50:
-                        board.reset_board()
-                        checkmate = False
-                        checkmate_button = False
-                        selected_piece = None
-
-                elif selected_piece and not checkmate:
+                if selected_piece and not checkmate:
                     if x == None or y == None:
                         continue
                     
@@ -273,7 +280,6 @@ def main(board, width, height):
                             check = True
                             if Move.is_checkmate(board):
                                 checkmate = True
-                                end_game(screen, board.turn, board)
 
                         if check:
                             sound = pygame.mixer.Sound("../assets/check.mp3")
@@ -319,6 +325,9 @@ def main(board, width, height):
             try: temp_width, temp_height
             except NameError: temp_width, temp_height = "500", "500"
             draw_settings(screen, temp_width, temp_height, width, height)
+            
+        if checkmate:
+            end_game(screen, board.turn, board, width, height)
 
         # Clock
 
