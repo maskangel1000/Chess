@@ -35,7 +35,6 @@ def draw_pieces(screen, board, dragging, selected_piece, width, height):
         screen.blit(drag_queue, (mouse_x - (width//8) / 2, mouse_y - (height//8) / 2))
     
 def get_mouse_square(board, width, height):
-    print(width, height)
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
     x = int(mouse_pos[0] // (width/8))
     y = int(mouse_pos[1] // (height/8))
@@ -46,7 +45,7 @@ def get_mouse_square(board, width, height):
         return None, None, None
     
 def draw_selector(board, screen, piece, x, y, dragging, selected_piece, width, height):
-    if not x or not y:
+    if x == None or y == None:
         return
     rect = (x*width/8, y*height/8, width/8, height/8)
     if dragging and selected_piece and selected_piece[0]:
@@ -257,7 +256,7 @@ def main(board, width, height):
                         selected_piece = None
 
                 elif selected_piece and not checkmate:
-                    if not x or not y:
+                    if x == None or y == None:
                         continue
                     
                     piece, old_x, old_y = selected_piece
