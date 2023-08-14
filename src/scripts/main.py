@@ -3,4 +3,4 @@ from Board import Board
 
 if __name__ == "__main__":
     board = Board()
-    main(board)
+    main(board, 500, 500)
