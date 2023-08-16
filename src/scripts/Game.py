@@ -1,12 +1,17 @@
 import pygame
+import tkinter as tk
 
 import Move
 
 LIGHT = (227, 209, 200)
 DARK = (112, 92, 69)
 
-width = 500
-height = 500
+root = tk.Tk()
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+width = round(screen_width/3.072)
+height = round(screen_height/1.728)
 
 typing_width = False
 typing_height = False
