@@ -5,7 +5,18 @@ import Move
 LIGHT = (227, 209, 200)
 DARK = (112, 92, 69)
 
-def draw_squares(screen, board, width, height):
+width = 500
+height = 500
+
+typing_width = False
+typing_height = False
+
+temp_width = str(width)
+temp_height = str(height)
+
+def draw_squares(screen, board):
+    global width, height
+    
     is_white = True
     for x in range(0, len(board.board)):
         for y in range(0, len(board.board[x])):
@@ -17,7 +28,9 @@ def draw_squares(screen, board, width, height):
             is_white = not is_white
         is_white = not is_white
 
-def draw_pieces(screen, board, dragging, selected_piece, width, height):
+def draw_pieces(screen, board, dragging, selected_piece):
+    global width, height
+    
     drag_queue = None
     for row in range(0, len(board.board)):
         for col in range(0, len(board.board[row])):
@@ -34,7 +47,9 @@ def draw_pieces(screen, board, dragging, selected_piece, width, height):
     if drag_queue:
         screen.blit(drag_queue, (mouse_x - (width//8) / 2, mouse_y - (height//8) / 2))
     
-def get_mouse_square(board, width, height):
+def get_mouse_square(board):
+    global width, height
+    
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
     x = int(mouse_pos[0] // (width/8))
     y = int(mouse_pos[1] // (height/8))
@@ -44,7 +59,9 @@ def get_mouse_square(board, width, height):
     except IndexError:
         return None, None, None
     
-def draw_selector(board, screen, piece, x, y, dragging, selected_piece, width, height):
+def draw_selector(board, screen, piece, x, y, dragging, selected_piece):
+    global width, height
+    
     if x == None or y == None:
         return
     rect = (x*width/8, y*height/8, width/8, height/8)
@@ -56,9 +73,11 @@ def draw_selector(board, screen, piece, x, y, dragging, selected_piece, width, h
     elif piece and piece.color == board.turn:
         pygame.draw.rect(screen, (0, 255, 0, 50), rect, width//130)
 
-def end_game(screen, loser, board, width, height):
-    draw_squares(screen, board, width, height)
-    draw_pieces(screen, board, None, None, width, height)
+def end_game(screen, loser, board):
+    global width, height
+    
+    draw_squares(screen, board)
+    draw_pieces(screen, board, None, None)
 
     winner = "White" if loser == 'b' else "Black"
     same_color = (195, 195, 195) if winner == "White" else (60, 60, 60)
@@ -90,7 +109,9 @@ def end_game(screen, loser, board, width, height):
     menu_text = font.render("MENU", True, same_color)
     screen.blit(menu_text, (width/2-85, height/2+10+height/7))
     
-def draw_menu(screen, width, height):
+def draw_menu(screen):
+    global width, height
+    
     background = pygame.Surface((width, height))
     background.set_alpha(200)
     background.fill((0, 0, 0))
@@ -114,7 +135,9 @@ def draw_menu(screen, width, height):
     settings_text = font.render("SETTINGS", True, (0, 0, 0))
     screen.blit(settings_text, (width/2-85, height/2+height/10))
     
-def draw_settings(screen, temp_width, temp_height, width, height):
+def draw_settings(screen):
+    global width, height, temp_width, temp_height
+    
     background = pygame.Surface((width, height))
     background.set_alpha(200)
     background.fill((0, 0, 0))
@@ -160,7 +183,8 @@ def draw_settings(screen, temp_width, temp_height, width, height):
     height_number = font.render(temp_height, True, (0, 0, 0))
     screen.blit(height_number, (width/2-85, height/2+height/10))
 
-def main(board, width, height):
+def main(board):
+    global width, height, temp_width, temp_height
 
     # Init
 
@@ -192,13 +216,16 @@ def main(board, width, height):
     checkmate_button = False
 
     while running:
-
         # Events
 
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
-                running = False
+                if menu == False and settings == False:
+                    menu = True
+                else:
+                    running = False
+                    continue
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 dragging = True
@@ -232,23 +259,17 @@ def main(board, width, height):
                         if width/50 <= mouse[0] <= width/50+100 and height/50 <= mouse[1] <= height/50+50:
                             settings = False
                             menu = True
-                        elif width - width/50 - 110 <= mouse[0] <= width - width/50 and height/50 <= mouse[1] <= height/50+50:
-                            try: temp_width, temp_height
-                            except NameError: temp_width, temp_height = "500", "500"
-                            
+                        elif width - width/50 - 110 <= mouse[0] <= width - width/50 and height/50 <= mouse[1] <= height/50+50:                           
                             width = int(temp_width)
                             height = int(temp_height)
                             
-                            main(board, width, height)
+                            main(board)
                 elif piece:
                     selected_piece = piece, x, y
                     
             if event.type == pygame.KEYDOWN:
                 if event.key != 8 and (event.key < 48 or event.key > 57):
                     continue
-                
-                try: temp_width, temp_height
-                except NameError: temp_width, temp_height = "500", "500"
                 
                 if typing_width:
                     if event.key == 8:
@@ -296,6 +317,9 @@ def main(board, width, height):
 
                     dragging = False
 
+        if running == False:
+            pygame.quit()
+        
         # Draws
 
         pygame.display.flip()
@@ -303,31 +327,29 @@ def main(board, width, height):
 
         # Updates
 
-        draw_squares(screen, board, width, height)
+        draw_squares(screen, board)
         
         if not checkmate and not menu and not settings:
             
             if not dragging: selected_piece = None
 
             try:
-                piece, x, y = get_mouse_square(board, width, height)
+                piece, x, y = get_mouse_square(board)
             except TypeError:
                 continue
 
-            draw_selector(board, screen, piece, x, y, dragging, selected_piece, width, height)            
+            draw_selector(board, screen, piece, x, y, dragging, selected_piece)            
         
-        draw_pieces(screen, board, dragging, selected_piece, width, height)
+        draw_pieces(screen, board, dragging, selected_piece)
         
         if menu:
-            draw_menu(screen, width, height)
+            draw_menu(screen)
             
         if settings:
-            try: temp_width, temp_height
-            except NameError: temp_width, temp_height = "500", "500"
-            draw_settings(screen, temp_width, temp_height, width, height)
+            draw_settings(screen)
             
         if checkmate:
-            end_game(screen, board.turn, board, width, height)
+            end_game(screen, board.turn, board)
 
         # Clock
 
