@@ -251,6 +251,8 @@ def main(board):
                     if width/2-100 <= mouse[0] <= width/2+100 and height/2+height/10 <= mouse[1] <= height/2+height/10+50:
                         menu = False
                         settings = True
+                        temp_width = str(width)
+                        temp_height = str(height)
                 elif settings:
                     if width/2-100 <= mouse[0] <= width/2+100 and height/2-height/10 <= mouse[1] <= height/2-height/10+50:
                         typing_width = True
@@ -264,11 +266,14 @@ def main(board):
                         if width/50 <= mouse[0] <= width/50+100 and height/50 <= mouse[1] <= height/50+50:
                             settings = False
                             menu = True
-                        elif width - width/50 - 110 <= mouse[0] <= width - width/50 and height/50 <= mouse[1] <= height/50+50:                           
-                            width = int(temp_width)
-                            height = int(temp_height)
-                            
-                            main(board)
+                        elif width - width/50 - 110 <= mouse[0] <= width - width/50 and height/50 <= mouse[1] <= height/50+50:
+                            try:
+                                width = int(temp_width)
+                                height = int(temp_height)
+                                main(board)
+                            except ValueError:
+                                temp_width = str(width)
+                                temp_height = str(height)
                 elif piece:
                     selected_piece = piece, x, y
                     
