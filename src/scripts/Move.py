@@ -280,23 +280,23 @@ def move(board, old_x, old_y, new_x, new_y):
     if legal:
         if isinstance(legal, list):
             if legal[1] == 1: # Promote
-                board.board[new_y][new_x] = Piece(color, 'q')
+                board.board[new_y][new_x] = Piece(color, 'q', new_y, new_x)
             elif legal[1] == 2: # Castle
                 if color == 'w' and new_x == 6:
-                    board.board[new_y][new_x] = Piece(color, 'k')
-                    board.board[new_y][new_x-1] = Piece(color, 'r')
+                    board.board[new_y][new_x] = Piece(color, 'k', new_y, new_x)
+                    board.board[new_y][new_x-1] = Piece(color, 'r', new_y, new_x)
                     board.board[new_y][7] = None
                 elif color == 'w' and new_x == 2:
-                    board.board[new_y][new_x] = Piece(color, 'k')
-                    board.board[new_y][new_x+1] = Piece(color, 'r')
+                    board.board[new_y][new_x] = Piece(color, 'k', new_y, new_x)
+                    board.board[new_y][new_x+1] = Piece(color, 'r', new_y, new_x)
                     board.board[new_y][0] = None
                 elif color == 'b' and new_x == 6:
-                    board.board[new_y][new_x] = Piece(color, 'k')
-                    board.board[new_y][new_x-1] = Piece(color, 'r')
+                    board.board[new_y][new_x] = Piece(color, 'k', new_y, new_x)
+                    board.board[new_y][new_x-1] = Piece(color, 'r', new_y, new_x)
                     board.board[new_y][7] = None
                 elif color == 'b' and new_x == 2:
-                    board.board[new_y][new_x] = Piece(color, 'k')
-                    board.board[new_y][new_x+1] = Piece(color, 'r')
+                    board.board[new_y][new_x] = Piece(color, 'k', new_y, new_x)
+                    board.board[new_y][new_x+1] = Piece(color, 'r', new_y, new_x)
                     board.board[new_y][0] = None
             elif legal[1] == 3: # Enpassant
                 board.board[new_y][new_x] = board.board[old_y][old_x]

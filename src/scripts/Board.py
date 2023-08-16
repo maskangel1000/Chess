@@ -51,7 +51,7 @@ class Board:
                     file += int(char)
                 else:
                     piece = piece_type[char]
-                    self.board[rank][file] = Piece(piece[0], piece[1])
+                    self.board[rank][file] = Piece(piece[0], piece[1], rank, file)
                     file += 1
         
         self.turn = fen.split(" ")[1]
