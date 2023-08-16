@@ -8,8 +8,7 @@ Chess made in Python using pygame.
 4. Drag and click pieces to move them
 
 ## TODO
-- Make start menu
-- Make settings menu
+- Change default resolution depending on monitor resolution
 - Make GUI library to more easily create GUIs
 - Completely rewrite logic of Move.py
 - Make website to play
