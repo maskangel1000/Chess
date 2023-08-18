@@ -274,7 +274,7 @@ def move(board, old_x, old_y, new_x, new_y):
 
     legal = is_legal(board, old_x, old_y, new_x, new_y)
         
-    piece = board.board[old_y][old_x].type
+    piece = board.board[old_y][old_x]
     color = board.turn
 
     if legal:
@@ -314,20 +314,20 @@ def move(board, old_x, old_y, new_x, new_y):
         # Castling
         # TODO: If rook is taken before moving, then other rook is placed in its spot, player can still castle
         
-        if piece != 'p' or not isinstance(legal, list) or (isinstance(legal, list) and legal[1] != 4):
+        if piece.type != 'p' or not isinstance(legal, list) or (isinstance(legal, list) and legal[1] != 4):
             board.enpassant_x, board.enpassant_y = None, None
 
-        if piece == 'k' and board.turn == 'w':
+        if piece.type == 'k' and board.turn == 'w':
             board.castle_wk, board.castle_wq = False, False
-        elif piece == 'k' and board.turn == 'q':
+        elif piece.type == 'k' and board.turn == 'q':
             board.castle_bk, board.castle_bq = False, False
         
-        elif piece == 'r' and board.turn == 'w':
+        elif piece.type == 'r' and board.turn == 'w':
             if old_y == 7 and old_x == 7:
                 board.castle_wk = False
             if old_y == 7 and old_x == 0:
                 board.castle_wq = False
-        elif piece == 'r' and board.turn == 'b':
+        elif piece.type == 'r' and board.turn == 'b':
             if old_y == 0 and old_x == 7:
                 board.castle_bk = False
             if old_y == 0 and old_x == 0:
@@ -336,6 +336,9 @@ def move(board, old_x, old_y, new_x, new_y):
         board.board[old_y][old_x] = None
 
         board.change_turn()
+        
+        piece.x = new_x
+        piece.y = new_y
 
         return True
     
