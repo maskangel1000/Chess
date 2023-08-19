@@ -14,3 +14,4 @@ Chess made in Python using pygame.
 
 ## Dependencies
 - pygame
+- tkinter
