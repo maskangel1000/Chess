@@ -275,10 +275,27 @@ def main(board):
                                 temp_width = str(width)
                                 temp_height = str(height)
                 elif piece:
+                    if board.current_fen != len(board.fen_list) - 1:
+                        continue
                     selected_piece = piece, x, y
                     
             if event.type == pygame.KEYDOWN:
-                if event.key != 8 and (event.key < 48 or event.key > 57):
+                
+                if event.key == 1073741904: # left arrow
+                    if menu or settings or checkmate:
+                        continue
+                    board.current_fen -= 1 if board.current_fen > 0 else 0
+                    board.load_fen(board.fen_list[board.current_fen])
+                    continue
+                
+                elif event.key == 1073741903: # right arrow
+                    if menu or settings or checkmate:
+                        continue
+                    board.current_fen += 1 if board.current_fen < len(board.fen_list) - 1 else 0
+                    board.load_fen(board.fen_list[board.current_fen])
+                    continue
+                
+                elif event.key != 8 and (event.key < 48 or event.key > 57):
                     continue
                 
                 if typing_width:
@@ -293,6 +310,7 @@ def main(board):
                         temp_height += chr(event.key)
             
             if event.type == pygame.MOUSEBUTTONUP:
+                
                 if selected_piece and not checkmate:
                     if x == None or y == None:
                         continue
@@ -304,8 +322,11 @@ def main(board):
                         capture = True
                     if board.board[old_y][old_x].type == 'k' and abs(x-old_x) > 1:
                         castle = True
-
+                    
                     if Move.move(board, old_x, old_y, x, y):
+                        
+                        board.current_fen += 1
+                        board.fen_list.append(board.position_to_fen())
 
                         if not Move.check_check(board, 0, 0, 0, 0):
                             check = True
